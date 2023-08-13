@@ -51,4 +51,6 @@ button:active {
 .grids {
   flex: 1;
   border: solid 1px;
+  text-align: center;
+  font-size: 8rem;
 }
