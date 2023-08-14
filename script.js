@@ -13,7 +13,7 @@ const Cell = () => {
   };
 };
 
-const Gameboard = (function () {
+const GameBoard = (function () {
   const rows = 3;
   const columns = 3;
   const board = [];
@@ -21,7 +21,7 @@ const Gameboard = (function () {
   for (let i = 0; i < rows; i++) {
     board[i] = [];
     for (let j = 0; j < columns; j++) {
-      board[i].push(Cell.getValue);
+      board[i].push(Cell());
     }
   }
 
@@ -34,32 +34,45 @@ const Gameboard = (function () {
   return { getBoard, playMove };
 })();
 
-const Players = () => {
+const Players = (() => {
   let players = ["X", "O"];
   return { players };
-};
+})();
 
 // flow of game
 const GameController = (players) => {
-  let activeTurn = players[0];
+  let activeTurn = players.players[0];
 
-  const switchTurns = () => {
-    activeTurn === players[0] ? players[1] : players[0];
+  const _switchTurns = () => {
+    activeTurn =
+      activeTurn === players.players[0]
+        ? players.players[1]
+        : players.players[0];
   };
   const getPlayerTurn = () => activeTurn;
 
-  return { switchTurns, getPlayerTurn };
+  const playRound = () => {
+    _switchTurns();
+  };
+
+  return { playRound, getPlayerTurn };
 };
+
+const game = GameController(Players);
 
 // visual representation
 const DisplayController = (function () {
-  let numberOfSquares = 3;
+  // let numberOfSquares = 3;
 
   // cacheDOM
   const gridSquares = document.querySelector("#game-board");
 
+  // update screen
+
+  gridSquares.textContent = "";
+
   // render
-  (function createSquares(numberOfSquares, gridSquares, Gameboard) {
+  (function createSquares(numberOfSquares, gridSquares, GameBoard) {
     let index = 0;
     for (let i = 0; i < numberOfSquares; i++) {
       const column = document.createElement("div");
@@ -69,11 +82,11 @@ const DisplayController = (function () {
       for (let j = 0; j < numberOfSquares; j++) {
         const row = document.createElement("div");
         row.setAttribute("class", "grids");
-        row.textContent = Gameboard.getBoard[index];
+        row.textContent = GameBoard.getBoard[index];
         column.appendChild(row);
 
         index += 1;
       }
     }
-  })(numberOfSquares, gridSquares, Gameboard);
+  })(numberOfSquares, gridSquares, GameBoard);
 })();
