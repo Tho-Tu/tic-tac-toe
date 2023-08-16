@@ -28,7 +28,7 @@ const GameBoard = (function () {
   const getBoard = () => {
     for (const row of board) {
       for (const cell of row) {
-        console.log(cell.getValue());
+        console.log(`element: ${cell.getValue()}`);
       }
     }
     return board;
@@ -51,6 +51,7 @@ const Players = (() => {
 })();
 
 const GameController = (players) => {
+  const board = GameBoard();
   let activeTurn = players.players[0];
 
   const _switchTurns = () => {
@@ -63,9 +64,52 @@ const GameController = (players) => {
 
   const endGame = () => {
     // logic to decide winner or draw
+    const winConditionS = [
+      [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+      ],
+      [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
+      [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+      ],
+      [
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ],
+      [
+        [0, 2],
+        [1, 2],
+        [2, 2],
+      ],
+      [
+        [0, 0],
+        [1, 1],
+        [2, 2],
+      ],
+      [
+        [0, 2],
+        [1, 1],
+        [2, 0],
+      ],
+    ];
   };
 
   const playRound = () => {
+    endGame();
     _switchTurns();
   };
 
