@@ -25,10 +25,21 @@ const GameBoard = (function () {
     }
   }
 
-  const getBoard = () => board;
+  const getBoard = () => {
+    for (const row of board) {
+      for (const cell of row) {
+        console.log(cell.getValue());
+      }
+    }
+    return board;
+  };
 
   const playMove = (row, column, player) => {
-    board[row][column].addMove(player);
+    if (board[row][column].getValue() === null) {
+      board[row][column].addMove(player);
+    } else {
+      return;
+    }
   };
 
   return { getBoard, playMove };
@@ -39,7 +50,6 @@ const Players = (() => {
   return { players };
 })();
 
-// flow of game
 const GameController = (players) => {
   let activeTurn = players.players[0];
 
@@ -51,6 +61,10 @@ const GameController = (players) => {
   };
   const getPlayerTurn = () => activeTurn;
 
+  const endGame = () => {
+    // logic to decide winner or draw
+  };
+
   const playRound = () => {
     _switchTurns();
   };
@@ -58,11 +72,11 @@ const GameController = (players) => {
   return { playRound, getPlayerTurn };
 };
 
-const game = GameController(Players);
-
 // visual representation
 const DisplayController = (function () {
   // let numberOfSquares = 3;
+
+  const game = GameController(Players);
 
   // cacheDOM
   const gridSquares = document.querySelector("#game-board");
