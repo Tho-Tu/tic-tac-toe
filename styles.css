@@ -26,11 +26,11 @@ body {
   color: white;
 }
 
-button:hover {
+#play-button:hover {
   background-color: #78350f;
 }
 
-button:active {
+#play-button:active {
   background-color: #78350f;
   box-shadow: 0 5px 10px black;
 }
@@ -43,7 +43,7 @@ button:active {
   flex-direction: column;
 }
 
-.column {
+.row {
   flex: 1;
   display: flex;
 }
@@ -53,4 +53,6 @@ button:active {
   border: solid 1px;
   text-align: center;
   font-size: 8rem;
+  padding: 0;
+  background-color: antiquewhite;
 }

@@ -50,19 +50,19 @@ const Players = (() => {
 })();
 
 const GameController = (players) => {
-  const board = GameBoard;
   let activeTurn = players.players[0];
+  let numberOfTurns = 0;
 
   const _switchTurns = () => {
     activeTurn =
       activeTurn === players.players[0]
         ? players.players[1]
         : players.players[0];
+
+    numberOfTurns += 1;
   };
-  const getPlayerTurn = () => activeTurn;
 
   const _endGame = () => {
-    // logic to decide winner or draw
     const winConditions = [
       [
         [0, 0],
@@ -107,57 +107,65 @@ const GameController = (players) => {
     ];
 
     for (const winCell of winConditions) {
-      let firstCell = board.getCellValue(winCell[0][0], winCell[0][1]);
-      let secondCell = board.getCellValue(winCell[1][0], winCell[1][1]);
-      let thirdCell = board.getCellValue(winCell[2][0], winCell[2][1]);
-      if (firstCell !== null) {
-        if (firstCell === secondCell && firstCell === thirdCell) {
-          console.log(`Player: ${getPlayerTurn()} WINS!`);
-          break;
-        } else {
-          console.log("Players Draw!");
-        }
+      let firstCell = GameBoard.getCellValue(winCell[0][0], winCell[0][1]);
+      let secondCell = GameBoard.getCellValue(winCell[1][0], winCell[1][1]);
+      let thirdCell = GameBoard.getCellValue(winCell[2][0], winCell[2][1]);
+      if (firstCell === secondCell && firstCell === thirdCell) {
+        console.log(`Player: ${getPlayerTurn()} WINS!`);
+        break;
+      } else if (numberOfTurns === 9) {
+        console.log("Game tied!");
       }
     }
   };
 
+  const getPlayerTurn = () => activeTurn;
+
   const playRound = () => {
     _endGame();
     _switchTurns();
+    DisplayController();
   };
 
   return { playRound, getPlayerTurn };
 };
 
-// visual representation
-const DisplayController = (function () {
-  // let numberOfSquares = 3;
-
+const DisplayController = function () {
   const game = GameController(Players);
 
   // cacheDOM
   const gridSquares = document.querySelector("#game-board");
+  const gridCell = document.querySelectorAll(".grids");
+
+  //bind events
+  gridCell.forEach((cell) => {
+    cell.addEventListener("click");
+  });
 
   // update screen
-
   gridSquares.textContent = "";
 
+  const board = GameBoard.getBoard();
+
   // render
-  (function createSquares(numberOfSquares, gridSquares, GameBoard) {
-    let index = 0;
-    for (let i = 0; i < numberOfSquares; i++) {
-      const column = document.createElement("div");
-      column.setAttribute("class", "column");
-      gridSquares.appendChild(column);
+  const createSquares = (gridSquares, board, GameBoard) => {
+    // let index = 0;
+    for (let i = 0; i < board.length; i++) {
+      const row = document.createElement("div");
+      row.setAttribute("class", "row");
+      gridSquares.appendChild(row);
 
-      for (let j = 0; j < numberOfSquares; j++) {
-        const row = document.createElement("div");
-        row.setAttribute("class", "grids");
-        row.textContent = GameBoard.getBoard[index];
-        column.appendChild(row);
-
-        index += 1;
+      for (let j = 0; j < board[i].length; j++) {
+        const cell = document.createElement("button");
+        cell.setAttribute("class", "grids");
+        cell.setAttribute("data-cell", `${i}${j}`);
+        cell.textContent = GameBoard.getCellValue(i, j);
+        row.appendChild(cell);
       }
     }
-  })(numberOfSquares, gridSquares, GameBoard);
-})();
+  };
+
+  createSquares(gridSquares, board, GameBoard);
+};
+
+DisplayController();
