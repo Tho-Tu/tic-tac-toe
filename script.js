@@ -139,7 +139,12 @@ const DisplayController = function () {
 
   //bind events
   gridCell.forEach((cell) => {
-    cell.addEventListener("click");
+    let row = cell.getAttribute("data-cell").slice(0, 1);
+    let column = cell.getAttribute("data-cell").slice(1, 2);
+    cell.addEventListener("click", () => {
+      GameBoard.playMove(row, column, game.getPlayerTurn());
+      createSquares(gridSquares, board, GameBoard);
+    });
   });
 
   // update screen
@@ -164,7 +169,6 @@ const DisplayController = function () {
       }
     }
   };
-
   createSquares(gridSquares, board, GameBoard);
 };
 
