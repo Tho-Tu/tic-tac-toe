@@ -39,7 +39,7 @@ body {
   background-color: antiquewhite;
   width: 600px;
   height: 600px;
-  display: flex;
+  display: none;
   flex-direction: column;
 }
 

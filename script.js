@@ -36,12 +36,14 @@ const GameBoard = (function () {
   const playMove = (row, column, player) => {
     if (getCellValue(row, column) === null) {
       board[row][column].addMove(player);
-    } else {
-      return;
     }
   };
 
-  return { getBoard, playMove, getCellValue };
+  const resetBoard = () => {
+    // resets board
+  };
+
+  return { getBoard, playMove, getCellValue, resetBoard };
 })();
 
 const Players = (() => {
@@ -52,6 +54,7 @@ const Players = (() => {
 const GameController = (players) => {
   let activeTurn = players.players[0];
   let numberOfTurns = 0;
+  let gameFinished = false;
 
   const _switchTurns = () => {
     activeTurn =
@@ -62,7 +65,7 @@ const GameController = (players) => {
     numberOfTurns += 1;
   };
 
-  const _endGame = () => {
+  const _checkEndGame = () => {
     const winConditions = [
       [
         [0, 0],
@@ -110,51 +113,47 @@ const GameController = (players) => {
       let firstCell = GameBoard.getCellValue(winCell[0][0], winCell[0][1]);
       let secondCell = GameBoard.getCellValue(winCell[1][0], winCell[1][1]);
       let thirdCell = GameBoard.getCellValue(winCell[2][0], winCell[2][1]);
-      if (firstCell === secondCell && firstCell === thirdCell) {
-        console.log(`Player: ${getPlayerTurn()} WINS!`);
-        break;
-      } else if (numberOfTurns === 9) {
+
+      if (numberOfTurns === 8) {
+        gameFinished = true;
         console.log("Game tied!");
+        break;
+      } else if (
+        firstCell !== null &&
+        secondCell !== null &&
+        thirdCell !== null
+      ) {
+        if (firstCell === secondCell && firstCell === thirdCell) {
+          gameFinished = true;
+          console.log(`Player: ${getPlayerTurn()} WINS!`);
+
+          break;
+        }
       }
     }
   };
 
   const getPlayerTurn = () => activeTurn;
 
-  const playRound = () => {
-    _endGame();
+  const playRound = (row, column, player) => {
+    GameBoard.playMove(row, column, player);
+    _checkEndGame();
     _switchTurns();
-    DisplayController();
+    // DisplayController();
   };
 
-  return { playRound, getPlayerTurn };
+  return { playRound, getPlayerTurn, gameFinished };
 };
 
 const DisplayController = function () {
   const game = GameController(Players);
-
-  // cacheDOM
-  const gridSquares = document.querySelector("#game-board");
-  const gridCell = document.querySelectorAll(".grids");
-
-  //bind events
-  gridCell.forEach((cell) => {
-    let row = cell.getAttribute("data-cell").slice(0, 1);
-    let column = cell.getAttribute("data-cell").slice(1, 2);
-    cell.addEventListener("click", () => {
-      GameBoard.playMove(row, column, game.getPlayerTurn());
-      createSquares(gridSquares, board, GameBoard);
-    });
-  });
-
-  // update screen
-  gridSquares.textContent = "";
-
   const board = GameBoard.getBoard();
 
-  // render
+  const gridSquares = document.querySelector("#game-board");
+
   const createSquares = (gridSquares, board, GameBoard) => {
-    // let index = 0;
+    gridSquares.textContent = "";
+
     for (let i = 0; i < board.length; i++) {
       const row = document.createElement("div");
       row.setAttribute("class", "row");
@@ -168,8 +167,39 @@ const DisplayController = function () {
         row.appendChild(cell);
       }
     }
+    const gridCell = document.querySelectorAll(".grids");
+
+    gridCell.forEach((cell) => {
+      let row = cell.getAttribute("data-cell").slice(0, 1);
+      let column = cell.getAttribute("data-cell").slice(1, 2);
+      cell.addEventListener("click", () => {
+        if (!game.gameFinished) {
+          console.log(game.gameFinished);
+          cell.setAttribute("style", "background: white;");
+          game.playRound(row, column, game.getPlayerTurn());
+          createSquares(gridSquares, board, GameBoard);
+        }
+      });
+    });
   };
+
+  // render
   createSquares(gridSquares, board, GameBoard);
 };
 
 DisplayController();
+
+// displays/hides the GameBoard
+const displayGameBoard = document.querySelector("#play-button");
+const theGameBoard = document.querySelector("#game-board");
+let showBoard = false;
+
+displayGameBoard.addEventListener("click", () => {
+  if (showBoard === false) {
+    theGameBoard.style.display = "flex";
+    showBoard = true;
+  } else {
+    theGameBoard.style.display = "none";
+    showBoard = false;
+  }
+});
