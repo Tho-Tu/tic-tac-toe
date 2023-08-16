@@ -26,20 +26,15 @@ const GameBoard = (function () {
   }
 
   const getBoard = () => {
-    // for (const row of board) {
-    //   for (const cell of row) {
-    //     console.log(`${cell.getValue()}`);
-    //   }
-    // }
     return board;
   };
 
   const getCellValue = (row, column) => {
-    return board[row][column].getValue;
+    return board[row][column].getValue();
   };
 
   const playMove = (row, column, player) => {
-    if (board[row][column].getValue() === null) {
+    if (getCellValue(row, column) === null) {
       board[row][column].addMove(player);
     } else {
       return;
@@ -111,10 +106,10 @@ const GameController = (players) => {
       ],
     ];
 
-    for (const win of winConditions) {
-      let firstCell = board.getBoard[win[0][0]][win[0][1]].getValue();
-      let secondCell = board.getBoard[win[1][0]][win[1][1]].getValue();
-      let thirdCell = board.getBoard[win[2][0]][win[2][1]].getValue();
+    for (const winCell of winConditions) {
+      let firstCell = board.getCellValue(winCell[0][0], winCell[0][1]);
+      let secondCell = board.getCellValue(winCell[1][0], winCell[1][1]);
+      let thirdCell = board.getCellValue(winCell[2][0], winCell[2][1]);
       if (firstCell !== null) {
         if (firstCell === secondCell && firstCell === thirdCell) {
           console.log(`Player: ${getPlayerTurn()} WINS!`);
