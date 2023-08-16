@@ -34,8 +34,10 @@ const GameBoard = (function () {
   };
 
   const playMove = (row, column, player) => {
-    if (getCellValue(row, column) === null) {
-      board[row][column].addMove(player);
+    if (!GameController.gameStatus.gameFinished) {
+      if (getCellValue(row, column) === null) {
+        board[row][column].addMove(player);
+      }
     }
   };
 
@@ -51,10 +53,10 @@ const Players = (() => {
   return { players };
 })();
 
-const GameController = (players) => {
+const GameController = ((players) => {
   let activeTurn = players.players[0];
   let numberOfTurns = 0;
-  let gameFinished = false;
+  let gameStatus = { gameFinished: false };
 
   const _switchTurns = () => {
     activeTurn =
@@ -115,7 +117,7 @@ const GameController = (players) => {
       let thirdCell = GameBoard.getCellValue(winCell[2][0], winCell[2][1]);
 
       if (numberOfTurns === 8) {
-        gameFinished = true;
+        gameStatus.gameFinished = true;
         console.log("Game tied!");
         break;
       } else if (
@@ -124,9 +126,8 @@ const GameController = (players) => {
         thirdCell !== null
       ) {
         if (firstCell === secondCell && firstCell === thirdCell) {
-          gameFinished = true;
+          gameStatus.gameFinished = true;
           console.log(`Player: ${getPlayerTurn()} WINS!`);
-
           break;
         }
       }
@@ -139,15 +140,14 @@ const GameController = (players) => {
     GameBoard.playMove(row, column, player);
     _checkEndGame();
     _switchTurns();
-    // DisplayController();
   };
 
-  return { playRound, getPlayerTurn, gameFinished };
-};
+  return { playRound, getPlayerTurn, gameStatus };
+})(Players);
 
 const DisplayController = function () {
-  const game = GameController(Players);
   const board = GameBoard.getBoard();
+  const gameStatus = GameController.gameStatus;
 
   const gridSquares = document.querySelector("#game-board");
 
@@ -173,12 +173,10 @@ const DisplayController = function () {
       let row = cell.getAttribute("data-cell").slice(0, 1);
       let column = cell.getAttribute("data-cell").slice(1, 2);
       cell.addEventListener("click", () => {
-        if (!game.gameFinished) {
-          console.log(game.gameFinished);
-          cell.setAttribute("style", "background: white;");
-          game.playRound(row, column, game.getPlayerTurn());
-          createSquares(gridSquares, board, GameBoard);
-        }
+        console.log(gameStatus.gameFinished);
+        cell.setAttribute("style", "background: white;");
+        GameController.playRound(row, column, GameController.getPlayerTurn());
+        createSquares(gridSquares, board, GameBoard);
       });
     });
   };
