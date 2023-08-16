@@ -26,12 +26,16 @@ const GameBoard = (function () {
   }
 
   const getBoard = () => {
-    for (const row of board) {
-      for (const cell of row) {
-        console.log(`element: ${cell.getValue()}`);
-      }
-    }
+    // for (const row of board) {
+    //   for (const cell of row) {
+    //     console.log(`${cell.getValue()}`);
+    //   }
+    // }
     return board;
+  };
+
+  const getCellValue = (row, column) => {
+    return board[row][column].getValue;
   };
 
   const playMove = (row, column, player) => {
@@ -42,7 +46,7 @@ const GameBoard = (function () {
     }
   };
 
-  return { getBoard, playMove };
+  return { getBoard, playMove, getCellValue };
 })();
 
 const Players = (() => {
@@ -51,7 +55,7 @@ const Players = (() => {
 })();
 
 const GameController = (players) => {
-  const board = GameBoard();
+  const board = GameBoard;
   let activeTurn = players.players[0];
 
   const _switchTurns = () => {
@@ -62,9 +66,9 @@ const GameController = (players) => {
   };
   const getPlayerTurn = () => activeTurn;
 
-  const endGame = () => {
+  const _endGame = () => {
     // logic to decide winner or draw
-    const winConditionS = [
+    const winConditions = [
       [
         [0, 0],
         [0, 1],
@@ -106,10 +110,24 @@ const GameController = (players) => {
         [2, 0],
       ],
     ];
+
+    for (const win of winConditions) {
+      let firstCell = board.getBoard[win[0][0]][win[0][1]].getValue();
+      let secondCell = board.getBoard[win[1][0]][win[1][1]].getValue();
+      let thirdCell = board.getBoard[win[2][0]][win[2][1]].getValue();
+      if (firstCell !== null) {
+        if (firstCell === secondCell && firstCell === thirdCell) {
+          console.log(`Player: ${getPlayerTurn()} WINS!`);
+          break;
+        } else {
+          console.log("Players Draw!");
+        }
+      }
+    }
   };
 
   const playRound = () => {
-    endGame();
+    _endGame();
     _switchTurns();
   };
 
