@@ -67,6 +67,7 @@ const GameController = ((players) => {
   };
 
   const _checkEndGame = () => {
+    let winDetected = false;
     const winConditions = [
       [
         [0, 0],
@@ -115,20 +116,17 @@ const GameController = ((players) => {
       let secondCell = GameBoard.getCellValue(winCell[1][0], winCell[1][1]);
       let thirdCell = GameBoard.getCellValue(winCell[2][0], winCell[2][1]);
 
-      if (numberOfTurns === 8) {
-        gameStatus.gameFinished = true;
-        playerWinner = "Game tied!";
-        break;
-      } else if (
-        firstCell !== null &&
-        secondCell !== null &&
-        thirdCell !== null
-      ) {
+      if (firstCell !== null && secondCell !== null && thirdCell !== null) {
         if (firstCell === secondCell && firstCell === thirdCell) {
           gameStatus.gameFinished = true;
           playerWinner = `Player: ${getPlayerTurn()} WINS!`;
           break;
         }
+      }
+
+      if (!winDetected && numberOfTurns === 8) {
+        gameStatus.gameFinished = true;
+        playerWinner = "Game tied!";
       }
     }
   };
@@ -216,6 +214,6 @@ const DisplayController = (function () {
 
   // render
   displayWithPlay();
-  createSquares(gridSquares, board, GameBoard);
   displayPlayerPrompt();
+  createSquares(gridSquares, board, GameBoard);
 })();
