@@ -40,7 +40,11 @@ const GameBoard = (function () {
   };
 
   const resetBoard = () => {
-    // resets board
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < columns; j++) {
+        board[i][j].addMove(null);
+      }
+    }
   };
 
   return { getBoard, playMove, getCellValue, resetBoard };
@@ -67,7 +71,6 @@ const GameController = ((players) => {
   };
 
   const _checkEndGame = () => {
-    let winDetected = false;
     const winConditions = [
       [
         [0, 0],
@@ -123,8 +126,7 @@ const GameController = ((players) => {
           break;
         }
       }
-
-      if (!winDetected && numberOfTurns === 8) {
+      if (numberOfTurns === 8) {
         gameStatus.gameFinished = true;
         playerWinner = "Game tied!";
       }
@@ -145,19 +147,33 @@ const GameController = ((players) => {
     return playerWinner;
   };
 
-  return { playRound, getPlayerTurn, getWinner };
+  const resetGame = () => {
+    activeTurn = players.players[0];
+    numberOfTurns = 0;
+    gameStatus.gameFinished = false;
+    playerWinner = null;
+  };
+
+  return { gameStatus, getPlayerTurn, playRound, getWinner, resetGame };
 })(Players);
+
+const resetGame = () => {
+  GameBoard.resetBoard();
+  GameController.resetGame();
+  DisplayController.resetDisplay();
+};
 
 const DisplayController = (function () {
   const board = GameBoard.getBoard();
 
+  // cache DOM
   const gridSquares = document.querySelector("#game-board");
   const playerPrompt = document.querySelector("#player-prompt");
 
   const displayGameBoard = document.querySelector("#play-button");
   const theGameBoard = document.querySelector("#game-board");
 
-  // displays/hides the GameBoard
+  // displays the GameBoard
   const displayWithPlay = () => {
     let showBoard = false;
 
@@ -165,11 +181,10 @@ const DisplayController = (function () {
       if (showBoard === false) {
         theGameBoard.style.display = "flex";
         playerPrompt.style.display = "flex";
+        displayGameBoard.textContent = "Reset";
         showBoard = true;
       } else {
-        theGameBoard.style.display = "none";
-        playerPrompt.style.display = "none";
-        showBoard = false;
+        resetGame();
       }
     });
   };
@@ -210,10 +225,22 @@ const DisplayController = (function () {
     } else {
       playerPrompt.textContent = `${GameController.getWinner()}`;
     }
+
+    if (GameController.gameStatus.gameFinished === true) {
+      displayGameBoard.textContent = "Play Again!";
+    }
+  };
+
+  const resetDisplay = () => {
+    createSquares(gridSquares, GameBoard.getBoard(), GameBoard);
+    displayPlayerPrompt();
+    displayGameBoard.textContent = "Reset";
   };
 
   // render
   displayWithPlay();
   displayPlayerPrompt();
   createSquares(gridSquares, board, GameBoard);
+
+  return { resetDisplay };
 })();
