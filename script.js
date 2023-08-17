@@ -150,10 +150,31 @@ const GameController = ((players) => {
   return { playRound, getPlayerTurn, getWinner };
 })(Players);
 
-const DisplayController = function () {
+const DisplayController = (function () {
   const board = GameBoard.getBoard();
 
   const gridSquares = document.querySelector("#game-board");
+  const playerPrompt = document.querySelector("#player-prompt");
+
+  const displayGameBoard = document.querySelector("#play-button");
+  const theGameBoard = document.querySelector("#game-board");
+
+  // displays/hides the GameBoard
+  const displayWithPlay = () => {
+    let showBoard = false;
+
+    displayGameBoard.addEventListener("click", () => {
+      if (showBoard === false) {
+        theGameBoard.style.display = "flex";
+        playerPrompt.style.display = "flex";
+        showBoard = true;
+      } else {
+        theGameBoard.style.display = "none";
+        playerPrompt.style.display = "none";
+        showBoard = false;
+      }
+    });
+  };
 
   const createSquares = (gridSquares, board, GameBoard) => {
     gridSquares.textContent = "";
@@ -179,28 +200,22 @@ const DisplayController = function () {
       cell.addEventListener("click", () => {
         cell.setAttribute("style", "background: white;");
         GameController.playRound(row, column, GameController.getPlayerTurn());
+        displayPlayerPrompt();
         createSquares(gridSquares, board, GameBoard);
       });
     });
   };
 
+  const displayPlayerPrompt = () => {
+    if (GameController.getWinner() === null) {
+      playerPrompt.textContent = `Player ${GameController.getPlayerTurn()}'s turn!`;
+    } else {
+      playerPrompt.textContent = `${GameController.getWinner()}`;
+    }
+  };
+
   // render
+  displayWithPlay();
   createSquares(gridSquares, board, GameBoard);
-};
-
-DisplayController();
-
-// displays/hides the GameBoard
-const displayGameBoard = document.querySelector("#play-button");
-const theGameBoard = document.querySelector("#game-board");
-let showBoard = false;
-
-displayGameBoard.addEventListener("click", () => {
-  if (showBoard === false) {
-    theGameBoard.style.display = "flex";
-    showBoard = true;
-  } else {
-    theGameBoard.style.display = "none";
-    showBoard = false;
-  }
-});
+  displayPlayerPrompt();
+})();
